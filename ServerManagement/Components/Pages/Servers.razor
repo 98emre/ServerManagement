@@ -1,0 +1,107 @@
+﻿@page "/servers"
+@rendermode InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+<h3>Servers</h3>
+<br />
+<br />
+
+<div class="container-fluid">
+    <div class="row w-50">
+        @foreach (var city in cities)
+        {
+            <div class="col">
+                <div class="card mb-2 mt-3 @(selectedCity.Equals(city,StringComparison.OrdinalIgnoreCase) ? "border-primary" : "")">
+                    <img src="@($"/images/{city}.png")" alt="...." class="card-img-top"/>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary me-2 mt-3" @onclick="(() => { SelectCity(city); })">@city</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<br />
+
+<div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" @bind-value:event ="oninput">
+    <button class="btn btn-primary" type="button" id="button-search" @onclick="HandleSearch">Search</button>
+</div>
+
+<br />
+
+<ul>
+    @foreach(var server in servers)
+    {
+        <li>
+            @server.Name in @server.City is <span style="color: @((server.IsOnline) ? "green" : "red")">@(server.IsOnline ? "online" : "offline")</span>
+             
+            <a href="/servers/@server.ServerId" class="btn btn-link m-e">Edit</a>
+
+            <EditForm 
+                Model="server" 
+                FormName="@($"form-server-{server.ServerId}")"
+                 OnValidSubmit="@(() => {DeleteServer(server.ServerId); })">
+
+                 <button type="submit" class="btn btn-danger">Delete</button>
+
+            </EditForm>
+
+        </li>    
+    }
+
+</ul>
+
+<p>
+    <a href="/servers/add" class="btn btn-primary">Add</a>
+</p>
+
+
+@code {
+    private List<Server> servers;
+
+    private List<string> cities;
+
+    private string selectedCity = "Toronto";
+
+
+    private string _serverFilter = "";
+    private string serverFilter 
+    { 
+        get => _serverFilter; 
+        set 
+        { 
+            _serverFilter = value; 
+            this.servers = ServersRepository.SearchServers(_serverFilter);
+        } 
+    }
+
+    protected override void OnInitialized()
+    {
+        cities = CitiesRepository.GetCities();
+        servers = ServersRepository.GetServersByCity("Toronto");
+    }
+
+    private async Task DeleteServer(int serverId)
+    {
+        if (serverId > 0)
+        {
+            ServersRepository.DeleteServer(serverId);
+            servers = ServersRepository.GetServersByCity(selectedCity);
+        }
+    }
+
+    private void SelectCity(string cityName)
+    {
+        this.selectedCity = cityName;
+        this.servers = ServersRepository.GetServersByCity(cityName);
+    }
+
+    private void HandleSearch()
+    {
+        this.servers = ServersRepository.SearchServers(serverFilter);
+        this.selectedCity = string.Empty;
+    }
+}
