@@ -1,0 +1,29 @@
+﻿
+@if(City != null)
+{
+    <div class="col">
+        <div class="card mb-2 mt-3 @(SelectedCity.Equals(City,StringComparison.OrdinalIgnoreCase) ? "border-primary" : "")">
+            <img src="@($"/images/{City}.png")" alt="...." class="card-img-top" />
+            <div class="card-body">
+                <button type="button" class="btn btn-primary me-2 mt-3" @onclick="(() => { SelectCity(City); })">@City</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? City { get; set; } = string.Empty;
+
+    [Parameter]
+    public string SelectedCity { get; set; } = "Toronto";
+
+    [Parameter]
+    public EventCallback<string> SelectedCityCallBack { get; set; }
+
+    private void SelectCity(string cityName)
+    {
+        SelectedCityCallBack.InvokeAsync(cityName);
+    }
+
+}
