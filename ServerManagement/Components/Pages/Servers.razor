@@ -1,4 +1,4 @@
-﻿@page "/servers"
+﻿@page "/servers" 
 @rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager
@@ -11,19 +11,16 @@
 
 <br />
 
-
-
-
-<div class="input-group mb-3">
-    <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" @bind-value:event ="oninput">
-    <button class="btn btn-primary" type="button" id="button-search" @onclick="HandleSearch">Search</button>
-</div>
+<SearchBarComponent 
+    SearchCallBack="HandleSearch">
+</SearchBarComponent>
 
 <br />
 
 <ServerListComponent 
     @rendermode="InteractiveServer" 
-    CityName="@selectedCity"></ServerListComponent>
+    CityName="@selectedCity"
+    SearchFilter="@searchFilter"></ServerListComponent>
 
 <p>
     <a href="/servers/add" class="btn btn-primary">Add</a>
@@ -34,26 +31,15 @@
 
 
     private string selectedCity = "Toronto";
-
-    private string _serverFilter = "";
-    private string serverFilter 
-    { 
-        get => _serverFilter; 
-        set 
-        { 
-            _serverFilter = value; 
-            //this.servers = ServersRepository.SearchServers(_serverFilter);
-        } 
-    }
+    private string searchFilter = "";
 
     private void HandleCitySelecttion(string cityName)
     {
         this.selectedCity = cityName;
     }
 
-    private void HandleSearch()
+    private void HandleSearch(string filter)
     {
-        //this.servers = ServersRepository.SearchServers(serverFilter);
-       // this.selectedCity = string.Empty;
+        searchFilter = filter;
     }
 }
