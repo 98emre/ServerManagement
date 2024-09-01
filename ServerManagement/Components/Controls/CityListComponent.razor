@@ -19,13 +19,12 @@
 
 @code {
 
+    [Parameter]
+    public EventCallback<string> SelectedCityCallBack { get; set; }
 
     private string selectedCity = "Toronto";
 
     private List<string> cities = CitiesRepository.GetCities();
-
-    [Parameter]
-    public EventCallback<string> SelectedCityCallBack { get; set; }
 
     private void HandleCitySelecttion(string cityName)
     {
@@ -33,5 +32,8 @@
         SelectedCityCallBack.InvokeAsync(cityName);
     }
 
-
+    public void ClearSelection()
+    {
+        this.selectedCity = string.Empty;
+    }
 }
