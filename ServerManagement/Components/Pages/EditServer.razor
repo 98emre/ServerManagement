@@ -1,17 +1,17 @@
 ﻿@page "/servers/{Id:int}"
-
 @inject NavigationManager NavigationManager
 
 <h3>Edit Server</h3>
-<br/>
-<br/>
+<br />
+<br />
 
-@if (server != null)
+@if (Server != null)
 {
-    <EditForm Model="server" FormName="formServer" OnValidSubmit="Submit">
+    <EditForm Model="Server" FormName="formServer" OnValidSubmit="HandleSubmit">
         <DataAnnotationsValidator></DataAnnotationsValidator>
         <ValidationSummary></ValidationSummary>
-        <InputNumber @bind-Value="server.ServerId" hidden></InputNumber>
+
+        <InputNumber @bind-Value="Server.ServerId" hidden></InputNumber>
 
         <div class="row mb-3">
             <div class="col-2">
@@ -19,8 +19,8 @@
             </div>
 
             <div class="col-6">
-                <ValidationMessage For ="() => server.Name"></ValidationMessage>
-                <InputText @bind-Value="server.Name" class="form-control"></InputText>
+                <InputText @bind-Value="Server.Name" class="form-control"></InputText>
+
             </div>
         </div>
 
@@ -30,11 +30,10 @@
             </div>
 
             <div class="col-6">
-                <ValidationMessage For="() => server.City"></ValidationMessage>
-                <InputText @bind-Value="server.City" class="form-control"></InputText>
+                <InputText @bind-Value="Server.City" class="form-control"></InputText>
+
             </div>
         </div>
-
 
         <div class="row mb-3">
             <div class="col-2">
@@ -42,45 +41,42 @@
             </div>
 
             <div class="col-6">
-                <InputCheckbox @bind-Value="server.IsOnline" class="form-check-input"></InputCheckbox>
+                <InputCheckbox @bind-Value="Server.IsOnline" class="form-check-input"></InputCheckbox>
             </div>
         </div>
-
-        <button type="submit" class="btn btn-primary me-2">Update</button>
+        <br/>
+        <button class="btn btn-primary m-1" type="submit">Update</button>
         <a href="/servers" class="btn btn-secondary">Close</a>
+
     </EditForm>
 }
 
 else
 {
-    <p>Server was not found</p>
+    <p>Server not found</p>
 }
-
 
 @code {
 
     [Parameter]
-    public int Id { get; set; }
+    public int? Id { get; set; }
 
     [SupplyParameterFromForm]
-    private Server? server { get; set; }
+    public Server? Server { get; set; }
 
     protected override void OnParametersSet()
     {
-        server ??= ServersRepository.GetServerById(Id);
+        Server = ServersRepository.GetServerById(this.Id.Value);
     }
 
-    private async Task Submit()
+    private async Task HandleSubmit()
     {
-        if(server == null)
+        if(Server != null)
         {
-            return;
-        }
+            Server.ServerId = Id.Value;
+            ServersRepository.UpdateServer(Server.ServerId, Server);
+            NavigationManager.NavigateTo("/servers");
 
-        else
-        {
-            ServersRepository.UpdateServer(server.ServerId, server);
-            await InvokeAsync(() => NavigationManager.NavigateTo("/servers"));
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿@page "/servers/add"
 
-<h3>Add Server</h3>
-
 @inject NavigationManager NavigationManager
 
-<EditForm Model="server" FormName="formServer" OnValidSubmit="Submit">
+
+<h3>Add Server</h3>
+
+<EditForm Model="server" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
     <InputNumber @bind-Value="server.ServerId" hidden></InputNumber>
@@ -42,21 +43,20 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary me-2">Update</button>
+    <button type="submit" class="btn btn-primary me-2">Save</button>
     <a href="/servers" class="btn btn-secondary">Close</a>
+
 </EditForm>
 
 @code {
-
-    [SupplyParameterFromForm]
     private Server server { get; set; } = new Server() { IsOnline = false };
 
-    private async Task Submit()
+    private async Task HandleSubmit()
     {
-        if(server != null)
+        if (server != null)
         {
             ServersRepository.AddServer(server);
-            await InvokeAsync(() => NavigationManager.NavigateTo("/servers"));
+            NavigationManager.NavigateTo("/servers");
         }
     }
 }

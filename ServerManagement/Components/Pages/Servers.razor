@@ -1,55 +1,95 @@
-﻿@page "/servers" 
-@rendermode InteractiveServer
-
+﻿@page "/servers"
 @inject NavigationManager NavigationManager
 
 <h3>Servers</h3>
-<br />
-<br />
+<br/>
+<br/>
 
-<CityListComponent 
-    @ref="cityListComponent"
-    SelectedCityCallBack="HandleCitySelecttion">
-</CityListComponent>
 
-<br />
+<div class="container-fluid text-center">
+    <div class="row w-50">
+        @foreach (var city in cities)
+        {
 
-<SearchBarComponent 
-    @ref="searchBarComponent"
-    SearchCallBack="HandleSearch">
-</SearchBarComponent>
+            <div class="col">
+                <div class="card @(selectedCity.Equals(city) ? "border-primary" : "")">
+                    <img src="@($"/images/{city}.png")" class="card-img-top" alt="@city">
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary" @onclick="(() => SelectCity(city))">@city</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
-<br />
 
-<ServerListComponent 
-    @rendermode="InteractiveServer" 
-    CityName="@selectedCity"
-    SearchFilter="@searchFilter"></ServerListComponent>
+<div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" />
+    <button class="btn btn-outline-primary" type="button" id="button-search" @onclick="HandleSearch">Search</button>
+</div>
 
-<p>
-    <a href="/servers/add" class="btn btn-primary">Add</a>
-</p>
+<br/>
+
+<a class="btn btn-primary m-1" href="/servers/add">Add Server</a>
+
+<ServerComponent></ServerComponent>
+
+<ul> 
+    @foreach(var server in servers)
+    {
+        <li @key="server.ServerId">
+            @server.Name in @server.City is <span style="color: @(server.IsOnline ? "green" : "red")"> @(server.IsOnline ? "online" : "offline") </span>
+            <a href="/servers/@server.ServerId" class="btn btn-link m-1">Edit</a>
+            
+            <EditForm Model="server" FormName="@($"form-server-{server.ServerId}")" OnValidSubmit="@(() => {DeleteServer(server.ServerId);})">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </EditForm>
+
+        </li>
+    }
+</ul>
 
 
 @code {
+    private List<Server> servers;
 
+    private List<String> cities;
 
     private string selectedCity = "Toronto";
-    private string searchFilter = "";
 
-    private CityListComponent? cityListComponent;
-    private SearchBarComponent? searchBarComponent;
+    private string serverFilter = "";
 
-    private void HandleCitySelecttion(string cityName)
+    protected override void OnInitialized()
     {
-        this.selectedCity = cityName;
-        this.searchFilter = string.Empty;
-        searchBarComponent?.ClearSearch();
+        LoadData();
     }
 
-    private void HandleSearch(string filter)
+    private void LoadData()
     {
-        searchFilter = filter;
-        cityListComponent?.ClearSelection();
+        servers = ServersRepository.GetServersByCity(selectedCity);
+        cities = CitiesRepository.GetCities();
+    }
+
+    private void DeleteServer(int serverId)
+    {
+        if(serverId > 0)
+        {
+            ServersRepository.DeleteServer(serverId);
+            LoadData();
+        }
+    }
+
+    private void SelectCity(string cityName)
+    {
+        this.selectedCity = cityName;
+        this.servers = ServersRepository.GetServersByCity(selectedCity);
+        this.serverFilter = string.Empty;
+    }
+
+    private void HandleSearch()
+    {
+        this.servers = ServersRepository.SearchServers(serverFilter);
+        this.selectedCity = string.Empty;
     }
 }
