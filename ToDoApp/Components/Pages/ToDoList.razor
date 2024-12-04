@@ -4,55 +4,52 @@
 <h3>To Do</h3>
 <br />
 
-<button type="button" class="btn btn-primary me-2 mb-2" @onclick="AddTask">Add Task</button>
+<button type="button" class="btn btn-primary" @onclick="AddTask">Add Task</button>
 
-@if(items != null && items.Count > 0)
+@if (items != null && items.Count() > 0)
 {
     <ul class="list-unstyled">
-        @foreach(var item in items)
+        @foreach (var item in items)
         {
             <li @key="item.Id">
-                <div class="row mb-1 me-1">
+                <div class="row mb-2">
+
                     <div class="col-1" style="width:30px">
-                        <input 
-                            type="checkbox" 
-                            class="form-check-input" 
-                            style="vertical-align:middle" 
-                            @bind-value="item.IsCompleted"
-                            checked="@item.IsCompleted" />
-                    </div>
-
-                    <div class="col">
-
-                        <input type="text"
-                               class="form-control border-0 @(item.IsCompleted ? "text-decoration-line-through": "")"
-                               style="vertical-align:middle"
-                               @bind-value="item.Name" 
-                               disabled ="@item.IsCompleted"/>                        
+                        <input type="checkbox" style="vertical-align:middle" class="form-check-input" @bind-value="item.IsCompleted" checked="@item.IsCompleted" />
                     </div>
 
                     <div class="col">
                         @if(item.IsCompleted)
                         {
-                            <p> Completed at: @item.DateCompleted.ToLongDateString()</p>
+                            <input type="text" style="vertical-align:middle" class="form-control border-0 text-decoration-line-through" @bind-value="item.Name" disabled/>
+                        }
+
+                        else
+                        {
+                            <input type="text" style="vertical-align:middle" class="form-control border-0" @bind-value="item.Name" />
                         }
                     </div>
 
+                    <div class="col">
+                        @if (item.IsCompleted)
+                        {
+                            <text>Completed at: @item.DateCompleted.ToLongDateString()</text>
+                        }
+                    </div>
                 </div>
-            </li>    
+            </li>
         }
     </ul>
 }
 
-
-@code {
+@code{
 
     private List<ToDoItem> items = ItemRepository.GetItems();
 
-
     private void AddTask()
     {
-        ItemRepository.AddItem(new ToDoItem { Name = "New Task"});
+        ItemRepository.AddItem(new ToDoItem { Name = "New Task" });
         items = ItemRepository.GetItems();
     }
+
 }
