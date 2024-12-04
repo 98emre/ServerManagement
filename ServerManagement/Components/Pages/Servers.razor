@@ -5,23 +5,9 @@
 <br/>
 <br/>
 
+<CityListComponent SelectedCityCallBack="HandleCitySelection"></CityListComponent>
 
-<div class="container-fluid text-center">
-    <div class="row w-50">
-        @foreach (var city in cities)
-        {
-
-            <div class="col">
-                <div class="card @(selectedCity.Equals(city) ? "border-primary" : "")">
-                    <img src="@($"/images/{city}.png")" class="card-img-top" alt="@city">
-                    <div class="card-body">
-                        <button type="button" class="btn btn-primary" @onclick="(() => SelectCity(city))">@city</button>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</div>
+<br/>
 
 <div class="input-group mb-3">
     <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" />
@@ -36,27 +22,18 @@
 
 
 @code {
-    private List<String> cities;
 
-    private string selectedCity = "Toronto";
-
+    private string selectedCity { get; set; } = "Toronto";
     private string serverFilter = "";
-
-    protected override void OnInitialized()
-    {
-        cities = CitiesRepository.GetCities();
-    }
-
-    private void SelectCity(string cityName)
-    {
-        this.selectedCity = cityName;
-        // this.servers = ServersRepository.GetServersByCity(selectedCity);
-        this.serverFilter = string.Empty;
-    }
 
     private void HandleSearch()
     {
         // this.servers = ServersRepository.SearchServers(serverFilter);
-        this.selectedCity = string.Empty;
+        // this.selectedCity = string.Empty;
+    }
+
+    private void HandleCitySelection(string cityName)
+    {
+        this.selectedCity = cityName;
     }
 }
