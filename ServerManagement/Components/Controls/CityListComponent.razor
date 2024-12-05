@@ -21,6 +21,11 @@
 
     private string selectedCity = "Toronto";
 
+    public void ClearSelection()
+    {
+        this.selectedCity = string.Empty;
+    }
+
     private void HandleCitySelection(string cityName)
     {
         selectedCity = cityName;

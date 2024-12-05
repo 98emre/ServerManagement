@@ -5,11 +5,11 @@
 <br/>
 <br/>
 
-<CityListComponent SelectedCityCallBack="HandleCitySelection"></CityListComponent>
+<CityListComponent SelectedCityCallBack="HandleCitySelection" @ref="cityListComponent"></CityListComponent>
 
 <br/>
 
-<SearchBarComponent SearchServerCallback="HandleSearchServer"></SearchBarComponent>
+<SearchBarComponent SearchServerCallback="HandleSearchServer" @ref="searchBarComponent"></SearchBarComponent>
 
 <br/>
 
@@ -22,15 +22,20 @@
     private string selectedCity = "Toronto";
     private string searchFilter = "";
 
+    private CityListComponent? cityListComponent;
+    private SearchBarComponent? searchBarComponent;
 
     private void HandleCitySelection(string cityName)
     {
         this.selectedCity = cityName;
-        this.searchFilter = "";
+        this.searchFilter = string.Empty;
+
+        searchBarComponent.ClearFilter();
     }
 
     private void HandleSearchServer(string searchFilter)
     {
         this.searchFilter = searchFilter;
+        cityListComponent?.ClearSelection();
     }
 }

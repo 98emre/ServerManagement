@@ -10,6 +10,11 @@
 
     private string serverFilter = "";
 
+    public void ClearFilter()
+    {
+        this.serverFilter = string.Empty;
+    }
+
     private void HandleSearch()
     {
         SearchServerCallback.InvokeAsync(serverFilter);
