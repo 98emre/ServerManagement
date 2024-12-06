@@ -4,6 +4,22 @@
 {
     <li @key="Server.ServerId">
         @Server.Name in @Server.City is <span style="color: @(Server.IsOnline ? "green" : "red")"> @(Server.IsOnline ? "online" : "offline") </span>
+
+
+        @if(Server.IsOnline)
+        {
+            <button type="button" class="btn btn-outline-danger m-1" @onclick="@(() => {Server.IsOnline = false; })">Turn Off</button>
+            Random random = new Random();
+            int randomNumber = random.Next(0, 500);
+            <text>@randomNumber</text>
+        }
+
+        else
+        {
+            <button type="button" class="btn btn-outline-success m-1" @onclick="@(() => {Server.IsOnline = true; })">Turn On</button>
+            <text>N/A</text>
+        }
+
         <a href="/servers/@Server.ServerId" class="btn btn-link m-1">Edit</a>
 
         <EditForm Model="Server" FormName="@($"form-server-{Server.ServerId}")" OnValidSubmit="@(() => {DeleteServer(Server.ServerId);})">
