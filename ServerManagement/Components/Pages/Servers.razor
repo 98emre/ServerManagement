@@ -13,9 +13,17 @@
 
 <br/>
 
-<a class="btn btn-primary m-1" href="/servers/add">Add Server</a>
+<CascadingValue Name="SelectedCity" Value="@selectedCity">
+    <ServerListComponent 
+        @rendermode="InteractiveServer"
+        CityName="@this.selectedCity"
+        SearchFilter="@searchFilter">
+    </ServerListComponent>
+</CascadingValue>
 
-<ServerListComponent @rendermode="InteractiveServer" CityName="@this.selectedCity" SearchFilter="@searchFilter"></ServerListComponent>
+<p>
+    <a class="btn btn-primary m-1" href="/servers/add">Add Server</a>
+</p>
 
 @code {
 
