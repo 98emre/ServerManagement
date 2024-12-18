@@ -1,11 +1,13 @@
 ﻿@page "/servers"
+@page "/servers/back_from/{CityName}"
+
 @inject NavigationManager NavigationManager
 
 <h3>Servers</h3>
 <br/>
 <br/>
 
-<CityListComponent SelectedCityCallBack="HandleCitySelection" @ref="cityListComponent"></CityListComponent>
+<CityListComponent SelectedCityCallBack="HandleCitySelection" SelectedCity="@this.selectedCity" @ref="cityListComponent"></CityListComponent>
 
 <br/>
 
@@ -22,10 +24,13 @@
 </CascadingValue>
 
 <p>
-    <a class="btn btn-primary m-1" href="/servers/add">Add Server</a>
+    <a class="btn btn-primary m-1" href="/server/">Add Server</a>
 </p>
 
 @code {
+
+    [Parameter]
+    public string? CityName { get; set; }
 
     private string selectedCity = "Toronto";
     private string searchFilter = "";
@@ -45,5 +50,17 @@
     {
         this.searchFilter = searchFilter;
         cityListComponent?.ClearSelection();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+            if(NavigationManager.Uri.Contains("back_from") && !string.IsNullOrWhiteSpace(CityName))
+            {
+                selectedCity = CityName;
+                StateHasChanged();
+            }
+        }
     }
 }

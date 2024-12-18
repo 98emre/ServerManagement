@@ -1,7 +1,22 @@
-﻿@page "/servers/{Id:int}"
-@inject NavigationManager NavigationManager
+﻿@page "/server/{Id:int?}"
 
-<h3>Edit Server</h3>
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<NavigationLock 
+    OnBeforeInternalNavigation="OnBeforeInternalNavigation"
+    ConfirmExternalNavigation="true"></NavigationLock>
+
+@if(Id.HasValue)
+{
+    <h3>Edit Server</h3>
+}
+
+else
+{
+    <h3>Add Server</h3>
+}
+
 <br />
 <br />
 
@@ -54,22 +69,57 @@ else
     [Parameter]
     public int? Id { get; set; }
 
+    [SupplyParameterFromQuery]
+    public string? City { get; set; }
+
     [SupplyParameterFromForm]
     public Server? Server { get; set; }
 
     protected override void OnParametersSet()
     {
-        Server = ServersRepository.GetServerById(this.Id.Value);
+        if(Id.HasValue)
+        {
+            Server = ServersRepository.GetServerById(this.Id.Value);
+        }
+
+        else
+        {
+            Server ??= new Server() { IsOnline = false };
+        }
+
+
+        if (Server != null && !string.IsNullOrEmpty(this.City))
+        {
+            Server.City = this.City;
+        }
     }
 
     private async Task HandleSubmit()
     {
         if(Server != null)
         {
-            Server.ServerId = Id.Value;
-            ServersRepository.UpdateServer(Server.ServerId, Server);
-            NavigationManager.NavigateTo("/servers");
+            if(Id.HasValue)
+            {
+                Server.ServerId = Id.Value;
+                ServersRepository.UpdateServer(Server.ServerId, Server);
+            }
 
+            else
+            {
+                ServersRepository.AddServer(Server);
+            }
+        }
+
+        NavigationManager.NavigateTo($"/servers/back_from/{this.Server.City}");
+    }
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirm","Are you sure you want to leave this page?");
+
+        if(!isConfirmed)
+        {
+            context.PreventNavigation();
         }
     }
 }
