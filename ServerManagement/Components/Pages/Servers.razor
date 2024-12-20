@@ -2,6 +2,7 @@
 @page "/servers/back_from/{CityName}"
 
 @inject NavigationManager NavigationManager
+@inject TorontoOnlineServerStore TorontoOnlineServerStore
 
 <h3>Servers</h3>
 <br/>
@@ -60,6 +61,13 @@
             {
                 selectedCity = CityName;
                 StateHasChanged();
+            }
+
+            var serverToronto = ServersRepository.GetServersByCity("Toronto");
+
+            if(serverToronto is not null)
+            {
+                TorontoOnlineServerStore.SetNumbersServersOnline(serverToronto.Count(x => x.IsOnline));
             }
         }
     }
