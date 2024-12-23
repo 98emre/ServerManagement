@@ -1,29 +1,65 @@
 ﻿
-@if(City != null)
-{
-    <div class="col">
-        <div class="card mb-2 mt-3 @(SelectedCity.Equals(City,StringComparison.OrdinalIgnoreCase) ? "border-primary" : "")">
-            <img src="@($"/images/{City}.png")" alt="...." class="card-img-top" />
-            <div class="card-body">
-                <button type="button" class="btn btn-primary me-2 mt-3" @onclick="(() => { SelectCity(City); })">@City</button>
-            </div>
+@implements IDisposable
+
+@inject TorontoOnlineServerStore TorontoOnlineServerStore
+
+<div class="col">
+    <div class="card @(SelectedCity.Equals(City) ? "border-primary" : "")">
+        <img src="@($"/images/{City}.png")" class="card-img-top" alt="@City">
+        <div class="card-body">
+            <button type="button" class="btn btn-primary" @onclick="(() => SelectCity(City))">@City</button>
         </div>
+
+        <div>
+            @if(City.Equals("Toronto",StringComparison.OrdinalIgnoreCase))
+            {
+                <text>@numberServersOnlineToronto</text>
+            }
+        </div>
+
     </div>
-}
+</div>
 
 @code {
-    [Parameter]
-    public string? City { get; set; } = string.Empty;
+    private int numberServersOnlineToronto;
 
     [Parameter]
     public string SelectedCity { get; set; } = "Toronto";
 
     [Parameter]
+    public string City { get; set; } = "";
+
+    [Parameter]
     public EventCallback<string> SelectedCityCallBack { get; set; }
 
-    private void SelectCity(string cityName)
+    private void SelectCity(string CityName)
     {
-        SelectedCityCallBack.InvokeAsync(cityName);
+        SelectedCityCallBack.InvokeAsync(CityName);
     }
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+            numberServersOnlineToronto = TorontoOnlineServerStore.GetNumbersServersOnline();
+            TorontoOnlineServerStore.AddStateChangeListeners(OnTorontoServerStatusChange);
+            StateHasChanged();
+        }
+    }
+
+    private void OnTorontoServerStatusChange()
+    {
+        numberServersOnlineToronto = TorontoOnlineServerStore.GetNumbersServersOnline();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        switch(City)
+        {
+            case "Toronto":
+                TorontoOnlineServerStore.RemoveStateChangeListeners(OnTorontoServerStatusChange);
+                break;
+        }
+    }
 }

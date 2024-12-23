@@ -1,4 +1,7 @@
-﻿@page "/servers/{Id:int}"
+﻿@page "/wasm/servers/{id:int}"
+@using WebAssemblyDemo.Client.Models
+
+@rendermode InteractiveWebAssembly
 
 @inject NavigationManager NavigationManager
 
@@ -11,16 +14,18 @@
     <EditForm Model="server" FormName="formServer" OnValidSubmit="Submit">
         <DataAnnotationsValidator></DataAnnotationsValidator>
         <ValidationSummary></ValidationSummary>
+
         <InputNumber @bind-Value="server.ServerId" hidden></InputNumber>
 
         <div class="row mb-3">
             <div class="col-2">
                 <label class="col-form-label">Name</label>
             </div>
-
             <div class="col-6">
-                <ValidationMessage For ="() => server.Name"></ValidationMessage>
                 <InputText @bind-Value="server.Name" class="form-control"></InputText>
+            </div>
+            <div class="col">
+                <ValidationMessage For="() => server.Name"></ValidationMessage>
             </div>
         </div>
 
@@ -28,32 +33,28 @@
             <div class="col-2">
                 <label class="col-form-label">City</label>
             </div>
-
             <div class="col-6">
-                <ValidationMessage For="() => server.City"></ValidationMessage>
                 <InputText @bind-Value="server.City" class="form-control"></InputText>
             </div>
+            <div class="col">
+                <ValidationMessage For="() => server.City"></ValidationMessage>
+            </div>
         </div>
-
 
         <div class="row mb-3">
             <div class="col-2">
                 <label class="col-form-label">Online</label>
             </div>
-
             <div class="col-6">
                 <InputCheckbox @bind-Value="server.IsOnline" class="form-check-input"></InputCheckbox>
             </div>
         </div>
-
-        <button type="submit" class="btn btn-primary me-2">Update</button>
-        <a href="/servers" class="btn btn-secondary">Close</a>
+        
+        <br/>
+        <button class="btn btn-primary" type="submit">Update</button>
+        &nbsp;
+        <a href="/servers" class="btn btn-primary">Close</a>
     </EditForm>
-}
-
-else
-{
-    <p>Server was not found</p>
 }
 
 
@@ -61,26 +62,23 @@ else
 
     [Parameter]
     public int Id { get; set; }
-
-    [SupplyParameterFromForm]
+    
     private Server? server { get; set; }
 
     protected override void OnParametersSet()
     {
-        server ??= ServersRepository.GetServerById(Id);
+        server ??= ServersRepository.GetServerById(this.Id);
     }
 
-    private async Task Submit()
+    private void Submit()
     {
-        if(server == null)
-        {
-            return;
-        }
-
-        else
+        if (server != null)
         {
             ServersRepository.UpdateServer(server.ServerId, server);
-            await InvokeAsync(() => NavigationManager.NavigateTo("/servers"));
         }
+
+        NavigationManager.NavigateTo($"/wasm/servers/");        
+        
     }
+
 }

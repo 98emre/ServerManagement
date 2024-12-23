@@ -1,45 +1,75 @@
-﻿@page "/servers" 
-@rendermode InteractiveServer
+﻿@page "/servers"
+@page "/servers/back_from/{CityName}"
 
 @inject NavigationManager NavigationManager
+@inject TorontoOnlineServerStore TorontoOnlineServerStore
+@inject IServerEFCoreRepository ServerEFCoreRepository
 
 <h3>Servers</h3>
-<br />
-<br />
+<br/>
+<br/>
 
-<CityListComponent SelectedCityCallBack="HandleCitySelecttion"></CityListComponent>
+<CityListComponent SelectedCityCallBack="HandleCitySelection" SelectedCity="@this.selectedCity" @ref="cityListComponent"></CityListComponent>
 
-<br />
+<br/>
 
-<SearchBarComponent 
-    SearchCallBack="HandleSearch">
-</SearchBarComponent>
+<SearchBarComponent SearchServerCallback="HandleSearchServer" @ref="searchBarComponent"></SearchBarComponent>
 
-<br />
+<br/>
 
-<ServerListComponent 
-    @rendermode="InteractiveServer" 
-    CityName="@selectedCity"
-    SearchFilter="@searchFilter"></ServerListComponent>
+<CascadingValue Name="SelectedCity" Value="@selectedCity">
+    <ServerListComponent 
+        @rendermode="InteractiveServer"
+        CityName="@this.selectedCity"
+        SearchFilter="@searchFilter">
+    </ServerListComponent>
+</CascadingValue>
 
 <p>
-    <a href="/servers/add" class="btn btn-primary">Add</a>
+    <a class="btn btn-primary m-1" href="/server/">Add Server</a>
 </p>
-
 
 @code {
 
+    [Parameter]
+    public string? CityName { get; set; }
 
     private string selectedCity = "Toronto";
     private string searchFilter = "";
 
-    private void HandleCitySelecttion(string cityName)
+    private CityListComponent? cityListComponent;
+    private SearchBarComponent? searchBarComponent;
+
+    private void HandleCitySelection(string cityName)
     {
         this.selectedCity = cityName;
+        this.searchFilter = string.Empty;
+
+        searchBarComponent.ClearFilter();
     }
 
-    private void HandleSearch(string filter)
+    private void HandleSearchServer(string searchFilter)
     {
-        searchFilter = filter;
+        this.searchFilter = searchFilter;
+        cityListComponent?.ClearSelection();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+            if(NavigationManager.Uri.Contains("back_from") && !string.IsNullOrWhiteSpace(CityName))
+            {
+                selectedCity = CityName;
+                StateHasChanged();
+            }
+
+            var serverToronto = ServerEFCoreRepository.GetServerByCity("Toronto");
+
+            if(serverToronto is not null)
+            {
+                TorontoOnlineServerStore.SetNumbersServersOnline(serverToronto.Count(x => x.IsOnline));
+            }
+        }
     }
 }

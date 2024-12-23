@@ -1,17 +1,24 @@
-﻿
+﻿@inject IServerEFCoreRepository ServerEFCoreRepository
 
-
-@if(servers != null && this.servers.Count() > 0)
-{
-
-    <ul>
-        @foreach (var server in servers)
-        {
-           <ServerComponent Server="server"></ServerComponent>
-        }
-
-    </ul>
-}
+<table class="table table-striped">
+    <RepeaterComponent Items="servers">
+        <Header>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>City</th>
+                    <th>Status</th>
+                    <th>People Online</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+        </Header>
+        <Row Context="server">
+            <ServerComponent Server="server"></ServerComponent>
+        </Row>
+    </RepeaterComponent>
+</table>
 
 @code {
 
@@ -25,14 +32,15 @@
 
     protected override void OnParametersSet()
     {
-        if (string.IsNullOrWhiteSpace(SearchFilter))
+        if(string.IsNullOrWhiteSpace(this.SearchFilter))
         {
-            servers = ServersRepository.GetServersByCity(CityName ?? "Toronto");
+            servers = ServerEFCoreRepository.GetServerByCity(CityName ?? "Toronto");
         }
 
         else
         {
-            servers = ServersRepository.SearchServers(SearchFilter);
+            servers = ServerEFCoreRepository.SearchServers(this.SearchFilter);
         }
+
     }
 }

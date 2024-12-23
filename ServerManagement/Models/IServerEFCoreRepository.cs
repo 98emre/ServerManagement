@@ -1,0 +1,14 @@
+﻿
+namespace ServerManagement.Models
+{
+    public interface IServerEFCoreRepository
+    {
+        void AddServer(Server server);
+        void DeleteServer(int serverId);
+        List<Server> GetServerByCity(string cityName);
+        Server? GetServerById(int id);
+        List<Server> GetServers();
+        List<Server> SearchServers(string serverFilter);
+        void UpdateServer(int serverId, Server server);
+    }
+}
