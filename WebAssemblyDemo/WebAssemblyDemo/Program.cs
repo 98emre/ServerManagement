@@ -1,5 +1,5 @@
 using WebAssemblyDemo.Client;
-using WebAssemblyDemo.Client.Pages;
+using WebAssemblyDemo.Client.Models;
 using WebAssemblyDemo.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +11,13 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddSingleton<ContainerStorage>();
 
+builder.Services.AddHttpClient("ServersApi", client =>
+{
+    client.BaseAddress = new Uri("https://webassemblydemo-3a373-default-rtdb.europe-west1.firebasedatabase.app/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+builder.Services.AddTransient<IServersRepository, ServersApiRepository>();
 
 var app = builder.Build();
 
@@ -22,12 +29,10 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 

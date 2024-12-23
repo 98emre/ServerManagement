@@ -2,6 +2,7 @@
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject IServerEFCoreRepository ServerEFCoreRepository
 
 <NavigationLock 
     OnBeforeInternalNavigation="OnBeforeInternalNavigation"
@@ -79,7 +80,7 @@ else
     {
         if(Id.HasValue)
         {
-            Server = ServersRepository.GetServerById(this.Id.Value);
+            Server = ServerEFCoreRepository.GetServerById(this.Id.Value);
         }
 
         else
@@ -101,12 +102,12 @@ else
             if(Id.HasValue)
             {
                 Server.ServerId = Id.Value;
-                ServersRepository.UpdateServer(Server.ServerId, Server);
+                ServerEFCoreRepository.UpdateServer(Server.ServerId, Server);
             }
 
             else
             {
-                ServersRepository.AddServer(Server);
+                ServerEFCoreRepository.AddServer(Server);
             }
         }
 

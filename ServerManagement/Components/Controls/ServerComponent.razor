@@ -1,5 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 @inject TorontoOnlineServerStore TorontoOnlineServerStore
+@inject IServerEFCoreRepository ServerEFCoreRepository
 
 @if(Server != null)
 {
@@ -66,7 +67,7 @@
     {
         if (serverId > 0)
         {
-            ServersRepository.DeleteServer(serverId);
+            ServerEFCoreRepository.DeleteServer(serverId);
             NavigationManager.NavigateTo("/servers", true);
         }
     }
@@ -116,6 +117,7 @@
                 }
 
                 this.Server.IsOnline = status;
+                ServerEFCoreRepository.UpdateServer(this.Server.ServerId, this.Server);
             }
         }
     }

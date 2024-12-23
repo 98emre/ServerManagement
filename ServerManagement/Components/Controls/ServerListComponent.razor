@@ -1,4 +1,5 @@
-﻿
+﻿@inject IServerEFCoreRepository ServerEFCoreRepository
+
 <table class="table table-striped">
     <RepeaterComponent Items="servers">
         <Header>
@@ -33,12 +34,12 @@
     {
         if(string.IsNullOrWhiteSpace(this.SearchFilter))
         {
-            servers = ServersRepository.GetServersByCity(CityName ?? "Toronto");
+            servers = ServerEFCoreRepository.GetServerByCity(CityName ?? "Toronto");
         }
 
         else
         {
-            servers = ServersRepository.SearchServers(this.SearchFilter);
+            servers = ServerEFCoreRepository.SearchServers(this.SearchFilter);
         }
 
     }

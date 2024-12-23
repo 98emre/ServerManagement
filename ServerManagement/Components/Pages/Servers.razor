@@ -3,6 +3,7 @@
 
 @inject NavigationManager NavigationManager
 @inject TorontoOnlineServerStore TorontoOnlineServerStore
+@inject IServerEFCoreRepository ServerEFCoreRepository
 
 <h3>Servers</h3>
 <br/>
@@ -63,7 +64,7 @@
                 StateHasChanged();
             }
 
-            var serverToronto = ServersRepository.GetServersByCity("Toronto");
+            var serverToronto = ServerEFCoreRepository.GetServerByCity("Toronto");
 
             if(serverToronto is not null)
             {
